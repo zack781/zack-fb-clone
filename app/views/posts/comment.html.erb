@@ -1,0 +1,13 @@
+
+<%= turbo_frame_tag "post" do  %>
+  <form action="/posts/add_comment" method="post" data-turbo="false">
+    <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+    <input type="hidden" name="post_id" value=<%=params[:post]%>>
+    <input type="hidden" name="cmt_prev" value=<%=params[:prev]%>> 
+    <%(params[:space].to_i).downto(0) do%>
+      &nbsp
+    <%end%>
+    <input type="text" name="cmt_content">
+    <input type="submit" value="comment">
+  </form>
+<% end %>

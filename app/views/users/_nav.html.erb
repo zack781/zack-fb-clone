@@ -1,0 +1,24 @@
+
+<div class="topnav">
+  <a class="active" href="/">Timeline</a>
+  <a href="/users/<%=current_user.id%>">Profile</a>
+  <a href="/users">Users</a>
+  
+  <div class="dropdown">
+    <button class="dropbtn">Notification(s)
+      <i class="fa fa-caret-down"></i>
+    </button>
+    <div class="dropdown-content">
+      <% User.find(current_user.id).notifications.each do |request| %>
+        <% if !request.sender.nil? %>
+          <a><%=User.find(request.sender).email%></a>
+          <form action="users/accept_friend_request" method="post">
+            <input type="hidden" name="request_id" value=<%=request.id%>>
+            <input type="hidden" name="sender_id" value=<%= request.sender %>>
+            <input type="submit" value="accept">
+          </form>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>

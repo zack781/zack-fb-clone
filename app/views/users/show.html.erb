@@ -1,0 +1,42 @@
+<%= render 'nav' %>
+
+<h1>Profile</h1>
+
+<% @links.each do |link| %>
+  <img width="100" height="100" src="<%= link %>">
+<% end %>
+
+<p><strong>Email:</strong> <%=@user.email%></p>
+<p><strong>Friends</strong></p>
+<ul>
+  <% @user.friendships_in.each do |relation| %>
+    <% if relation.this_user_id == @user.id  %>
+      <li><a href="users/<%=relation.other_user_id%>"><%=User.find(relation.other_user_id).email%></a></li>
+    <% else %>
+      
+      <li><a href="users/<%=relation.other_user_id%>"><%=User.find(relation.this_user_id).email%></a></li>
+    <% end %>
+  <% end %>
+
+  <% @user.friendships_out.each do |relation| %>
+    <% if relation.this_user_id == @user.id  %>
+      <li><a href="users/<%=relation.other_user_id%>"><%=User.find(relation.other_user_id).email%></a></li>
+    <% else %>
+      
+      <li><a href="users/<%=relation.other_user_id%>"><%=User.find(relation.this_user_id).email%></a></li>
+    <% end %>
+  <% end %>
+
+</ul>
+
+<hr>
+
+<h3>Create New Post</h3>
+
+<%= form_with model: @post do |form| %>
+  <%= form.label :content%>
+  <%= form.text_field :content %><br>
+  <%= form.file_field :avatar %><br>
+  <%= form.hidden_field :user_id, value:current_user.id %><br>
+  <%= form.submit %>
+<% end %>

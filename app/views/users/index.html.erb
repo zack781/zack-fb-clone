@@ -1,0 +1,21 @@
+<%= render 'nav' %>
+
+<h1>Users</h1>
+
+<ul>
+  <% @users.each do |user| %>
+    <% if user.id != current_user.id %>
+    <li>
+      <form action="/users/add_friend" method="post">
+        <a href="users/<%=user.id%>"><%=user.email%></a>
+        <input type="hidden" name="target_friend_id" value="<%=user.id%>">
+        <% if !check_friendship?(user.id) %>
+          <input type="submit" value="add friend">
+        <% else %>
+          Added
+        <% end %>
+      </form><br>
+    </li>
+  <% end %>
+  <% end %>
+</ul>

@@ -1,0 +1,97 @@
+<%= render 'users/nav' %>
+
+<h1>Timeline</h1>
+
+<%= turbo_stream_from @post %>
+
+<ul>
+  <% @posts.each do |post|%>
+    <hr>
+    <li id="post_list">
+      <%if post.user_id == current_user.id%>
+        
+        <% if post.avatar.attached? %>
+          <% puts "AVATAR ------- #{post.avatar}" %>
+          <image width="200" height="150" src="<%=(url_for(post.avatar))%>">
+        <% end %>
+
+        <p><%= post.content %></p>
+        <p>by <a href="users/<%=current_user.id%>">you</a></p>
+        <p><%=post.created_at%></p>
+
+        <form action="/posts/add_like" method="post">
+          <input type="hidden" name="post_id" value=<%=post.id%>>
+          <input type="submit" value="like">
+        </form>
+
+        <%=
+          if post.likes.nil?
+            0
+          else
+            post.likes
+          end
+        %>
+
+        <p><strong>Comments</strong></p>
+        <%=  turbo_frame_tag "post" do %> 
+          <%= link_to '- comment -', posts_comment_url({post: post, prev: nil, space: 0}) %>
+        <% end %>
+        <br>
+      <%else%> 
+        <p><%= post.content %></p>
+        <p>by <a href="users"><%=User.find(post.user_id).email%></a></p>
+        <p><%=post.created_at%></p>
+
+        <form action="/posts/add_like" method="post">
+          <input type="hidden" name="post_id" value=<%=post.id%>>
+          <input type="submit" value="like">
+        </form>
+
+        <%= 
+          if post.likes.nil?
+            0
+          else
+            post.likes
+          end
+        %>
+
+        <p><strong>Comments</strong></p>
+        <%=  turbo_frame_tag "post" do %> 
+          <%= link_to '- comment -', posts_comment_url({post: post, prev: nil, space: 0})%>
+        <% end %>
+        <br>
+      <% end %>
+     
+      <% if post.comments.length > 0 %>
+        <% layer1 = [] %>
+        <% post.comments.each do |comment| %>
+          <% if comment.prev.nil? %>
+            <%
+              layer1 << comment.id
+            %>
+          <% end %>
+        <% end %>
+        <% serialized = recursive_comment(layer1) %>
+        <% serialized.each do |elem| %>
+          <% elem[1].downto(0) do %>
+            &nbsp
+          <% end %>
+          <%=Comment.find(elem[0]).content%>
+
+          <%= turbo_frame_tag "post" do %>
+            <% elem[1].downto(0) do %>
+              &nbsp
+            <% end %>
+            <%= link_to '- comment -', posts_comment_url({post: post, prev: elem[0], space: 0})%> 
+          <% end %>
+          <br>
+        <% end %>
+      <% end %>
+    
+
+    </li>
+  <% end %>
+  <hr>
+</ul>
+
+<br><br><br><br><br><br>
